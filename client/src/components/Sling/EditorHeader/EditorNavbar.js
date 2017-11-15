@@ -5,7 +5,7 @@ const EditorNavbar = () => (
     <ul>
       <li>Item 1</li>
       <li>Item 2</li>
-      <li>Item 3</li>
+      <li onClick={() => localStorage.removeItem('token')}>Log out</li>
     </ul>
   </nav>
 );
