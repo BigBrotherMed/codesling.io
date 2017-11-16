@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const slingHistory = mongoose.Schema({
+const slingHistorySchema = mongoose.Schema({
   slingCodeId: {
     type: String,
     required: true
@@ -21,7 +21,7 @@ const slingHistory = mongoose.Schema({
     type: String,
     required: true
   }
-})
+});
 
 const slingSchema = mongoose.Schema({
   slingId: {
@@ -33,7 +33,7 @@ const slingSchema = mongoose.Schema({
     required: false,
   },
   commits: {
-    type: [slingHistory],
+    type: [slingHistorySchema],
     required: false
   }
 });
