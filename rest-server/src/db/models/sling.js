@@ -9,6 +9,10 @@ const slingSchema = mongoose.Schema({
     type: String,
     required: false,
   },
+  commits: {
+    type: Array,
+    required: true
+  }
 });
 
 const Sling = mongoose.model('Sling', slingSchema);
