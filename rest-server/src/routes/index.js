@@ -44,10 +44,10 @@ router.route('/slings/:slingId')
 router.route('/new-sling')
   .get(verifyUserWithJWT, slingCreateNew);
 
-router.route('/commit-sling')
+router.route('/commit-sling/:slingId')
   .post(verifyUserWithJWT, slingCommit);
 
-router.route('/revert-sling')
+router.route('/revert-sling/:slingId')
   .get(verifyUserWithJWT, slingRevert);
 
 router.route('/slings/messages/:slingId')

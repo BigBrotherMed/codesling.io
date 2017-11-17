@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 import bluebird from 'bluebird';
 
 import Sling from '../db/models/sling';
-import SlingCode from '../db/models/slingCode';
+import SlingCommit from '../db/models/slingCommit';
+import SlingCommitCode from '../db/models/slingCommitCode';
 import log from '../lib/log';
 import generateSlingId from '../lib/generateSlingId';
 
@@ -20,41 +21,35 @@ const startingText =
 
 hello();
 `;
+ 
 
+  
 export const slingCreateNew = async (req, res) => {
   try {
     let slingId = generateSlingId();
-    // regenerate slingId if it already exists
     while (await existsInDatabase(slingId)) {
       slingId = generateSlingId();
     }
-    const slingCode = new SlingCode({ text: startingText });
-    let savedSlingCode = null;
-    await slingCode.save((err, dbRecord) => {
-      savedSlingCode = dbRecord;
-    });
-    const slingHistory = {
-      id_SlingCode: savedSlingCode.id,
-      id_SlingHistorySource: 'N/A',
+    let code = new SlingCommitCode({ text: startingText });
+    await code.save((err, dbData) => { code = dbData; });
+    const commit = new SlingCommit({
+      sourceCommitId: 'N/A',
+      slingCodeId: code.id,
       timeStamp: Date.now(),
       name: 'New Sling',
-      id_User: 'ToDo',
-    };
-    const newSling = new Sling({ slingId, text: savedSlingCode.text });
-    newSling.slingHistory.push(slingHistory);
-    let savedSling = null;
-    console.log('newSling', newSling);
-    await newSling.save((err, dbRecord) => {
-      console.log('err', err, 'db', dbRecord);
-      savedSling = dbRecord;
+      userId: 'ToDo',
     });
-
-    
+    let sling = new Sling({ slingId, text: code.text });
+    sling.commits.push(commit);
+    await sling.save((err, dbData) => { sling = dbData; });
     log('sling successfully created');
     return res.status(200).json({
       success: true,
-      // sling: savedSling,
-      slingId: savedSling.slingId,
+      slingId: sling.slingId,
+      sling: {
+        commitList: sling.commits,
+        codeText: code.text,
+      },
     });
   } catch (e) {
     log('error fetching newSling', e);
@@ -67,32 +62,29 @@ export const slingCreateNew = async (req, res) => {
 
 export const slingCommit = async (req, res) => {
   try {
-    const currentSling = req.body.sling;
-    const slingCode = new SlingCode(currentSling.text);
-    let savedSlingCode = null;
-    await slingCode.save((err, dbRecord) => {
-      savedSlingCode = dbRecord;
-    });
-    const newSlingHistory = {
-      id_SlingCode: savedSlingCode.id,
-      id_SlingHistorySource: currentSling.id,
+    const { slingId, commitName, codeText } = req.body.commit;
+    let sling = await Sling.findOne({ slingId });
+    let code = new SlingCommitCode({ codeText });
+    await code.save((err, dbData) => { code = dbData; });
+    const lastCommit = sling.commits[sling.commits.length - 1];
+    const commit = new SlingCommit({
+      sourceCommitId: lastCommit.id,
+      slingCodeId: code.id,
       timeStamp: Date.now(),
-      name: 'New Sling',
+      name: commitName,
       id_User: 'ToDo',
-    };
-    const dbSling = await Sling.findOne({ id: currentSling.id });
-    dbSling.push(newSlingHistory);
-    let savedSling = null;
-    await dbSling.save((err, dbRecord) => {
-      savedSling = dbRecord;
     });
-    log('sling successfully created');
+    sling.commits.push(commit);
+    await sling.save((err, dbData) => { sling = dbData; });
+    log('sling successfully commited');
     return res.status(200).json({
       success: true,
-      sling: savedSling,
+      commit: {
+        commitList: sling.commits,
+      },
     });
   } catch (e) {
-    log('error fetching newSlingId', e);
+    log('error committing sling', e);
     return res.status(400).json({
       success: false,
       e,
@@ -102,32 +94,30 @@ export const slingCommit = async (req, res) => {
 
 export const slingRevert = async (req, res) => {
   try {
-    const currentSling = req.body.sling;
-    const slingCode = new SlingCode(currentSling.text);
-    let savedSlingCode = null;
-    await slingCode.save((err, dbRecord) => {
-      savedSlingCode = dbRecord;
-    });
-    const newSlingHistory = {
-      id_SlingCode: savedSlingCode.id,
-      id_SlingHistorySource: currentSling.id,
+    const { slingId, commitId } = req.body.revert;
+    let sling = await Sling.findOne({ slingId });
+    const revertToCommit = sling.commits.findOne({ id: commitId });
+    const commit = {
+      sourceCommitId: revertToCommit.id,
+      slingCodeId: revertToCommit.slingCodeId,
       timeStamp: Date.now(),
-      name: 'New Sling',
-      id_User: 'ToDo',
+      name: `Revert to '${revertToCommit.name}'`,
+      userId: 'ToDo',
     };
-    const dbSling = await Sling.findOne({ id: currentSling.id });
-    dbSling.push(newSlingHistory);
-    let savedSling = null;
-    await dbSling.save((err, dbRecord) => {
-      savedSling = dbRecord;
-    });
-    log('sling successfully created');
+    const code = SlingCommitCode.findOne({ id: revertToCommit.slingCodeId });
+    sling.text = code.text;
+    sling.push(commit);
+    await sling.save((err, dbData) => { sling = dbData; });
+    log('sling successfully reverted');
     return res.status(200).json({
       success: true,
-      sling: savedSling,
+      revert: {
+        commitList: sling.commits,
+        codeText: code.text,
+      },
     });
   } catch (e) {
-    log('error fetching newSlingId', e);
+    log('error reverting sling', e);
     return res.status(400).json({
       success: false,
       e,
