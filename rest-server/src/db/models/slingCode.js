@@ -1,10 +1,14 @@
 import mongoose from 'mongoose';
 
 const slingCodeSchema = mongoose.Schema({
-  code: {
+  // id: {
+  //   type: ObjectId,
+  //   required: true,
+  // },
+  text: {
     type: String,
     required: true,
-  }
+  },
 });
 
 const SlingCode = mongoose.model('SlingCode', slingCodeSchema);

@@ -11,7 +11,9 @@ import {
   slingPost,
   slingUpdate,
   slingDelete,
-  fetchNewSlingId,
+  slingCreateNew,
+  slingCommit,
+  slingRevert,
 } from '../controllers/slingController';
 import {
   slingMsgFetch,
@@ -40,7 +42,13 @@ router.route('/slings/:slingId')
   .delete(verifyUserWithJWT, slingDelete);
 
 router.route('/new-sling')
-  .get(verifyUserWithJWT, fetchNewSlingId);
+  .get(verifyUserWithJWT, slingCreateNew);
+
+router.route('/commit-sling')
+  .post(verifyUserWithJWT, slingCommit);
+
+router.route('/revert-sling')
+  .get(verifyUserWithJWT, slingRevert);
 
 router.route('/slings/messages/:slingId')
   .get(slingMsgFetch)
