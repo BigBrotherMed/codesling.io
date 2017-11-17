@@ -1,41 +1,49 @@
 import mongoose from 'mongoose';
 
 const slingHistorySchema = mongoose.Schema({
-  slingCodeId: {
+  // id: {
+  //   type: Type.ObjectId,
+  //   required: true,
+  // },
+  id_SlingCode: {
     type: String,
-    required: true
+    required: true,
   },
-  slingSourceId: {
+  id_SlingHistorySource: {
     type: String,
-    required: true
+    required: true,
   },
-  timestamp: {
+  timeStamp: {
     type: Date,
-    required: false
+    required: true,
   },
-  codeName: {
+  name: {
     type: String,
-    required: true
+    required: true,
   },
-  userId: {
+  id_User: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const slingSchema = mongoose.Schema({
+  // id: {
+  //   type: mongoose.Schema.Type.ObjectId,
+  //   required: true,
+  // },
   slingId: {
     type: String,
     required: true,
   },
   text: {
     type: String,
-    required: false,
+    required: true,
   },
-  commits: {
+  slingHistory: {
     type: [slingHistorySchema],
-    required: false
-  }
+    required: true,
+  },
 });
 
 const Sling = mongoose.model('Sling', slingSchema);
