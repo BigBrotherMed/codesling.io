@@ -9,7 +9,7 @@ const slingCommitSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  slingCodeId: {
+  slingCommitCodeId: {
     type: String,
     required: true,
   },
