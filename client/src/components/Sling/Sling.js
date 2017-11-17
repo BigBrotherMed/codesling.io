@@ -15,8 +15,18 @@ import './Sling.css';
 class Sling extends Component {
   state = {
     text: '',
-    stdout: ''
+    stdout: '',
+    commits: ['A', 'B', 'C']
   }
+
+  handleCommitClick = () => {
+    console.log('WASSUP');
+  }
+
+  saveCode = () => {
+    console.log('SAVE BUTTON HIT');
+  }
+
 
   runCode = () => {
     this.socket.emit('client.run');
@@ -92,6 +102,22 @@ class Sling extends Component {
           />
           <StdOut 
             text={this.state.stdout}
+          />
+        </div>
+        <div>
+          Commit History:
+
+          { this.state.commits.map( (element, index) => {
+            return <div key={index} onClick={this.handleCommitClick}> {element} </div>;
+
+          }) }
+
+          <Button
+            className="run-btn"
+            text="Save Code"
+            backgroundColor="red"
+            color="white"
+            onClick={this.saveCode}
           />
         </div>
       </div>
