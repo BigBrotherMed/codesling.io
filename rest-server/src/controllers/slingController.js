@@ -34,7 +34,7 @@ export const slingCreateNew = async (req, res) => {
     await code.save((err, dbData) => { code = dbData; });
     const commit = new SlingCommit({
       sourceCommitId: 'N/A',
-      slingCodeId: code.id,
+      slingCommitCodeId: code.id,
       timeStamp: Date.now(),
       name: 'New Sling',
       userId: 'ToDo',
@@ -69,7 +69,7 @@ export const slingCommit = async (req, res) => {
     const lastCommit = sling.commits[sling.commits.length - 1];
     const commit = new SlingCommit({
       sourceCommitId: lastCommit.id,
-      slingCodeId: code.id,
+      slingCommitCodeId: code.id,
       timeStamp: Date.now(),
       name: commitName,
       id_User: 'ToDo',
@@ -99,12 +99,12 @@ export const slingRevert = async (req, res) => {
     const revertToCommit = sling.commits.findOne({ id: commitId });
     const commit = {
       sourceCommitId: revertToCommit.id,
-      slingCodeId: revertToCommit.slingCodeId,
+      slingCommitCodeId: revertToCommit.slingCommitCodeId,
       timeStamp: Date.now(),
       name: `Revert to '${revertToCommit.name}'`,
       userId: 'ToDo',
     };
-    const code = SlingCommitCode.findOne({ id: revertToCommit.slingCodeId });
+    const code = SlingCommitCode.findOne({ id: revertToCommit.slingCommitCodeId });
     sling.text = code.text;
     sling.push(commit);
     await sling.save((err, dbData) => { sling = dbData; });
