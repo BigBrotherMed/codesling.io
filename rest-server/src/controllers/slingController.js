@@ -93,12 +93,8 @@ export const slingCommit = async (req, res) => {
 
 export const slingRevert = async (req, res) => {
   try {
-    console.log('HITTING REVERT REQ: ', req.query);
     const { slingId, commitId } = req.query;
-    console.log('SERVER SLING ID: ', slingId);
-    console.log('SERVER COMMIT ID: ', commitId)
     let sling = await Sling.findOne({ slingId });
-    console.log('THIS IS OBV A STRING: ', JSON.stringify(sling.commits[0]._id));
     let revertToCommit;
     // = sling.commits.findOne({ id: commitId });
     for(let i = 0; i < sling.commits.length; i++) {
@@ -119,10 +115,15 @@ export const slingRevert = async (req, res) => {
       name: `Revert to '${revertToCommit.name}'`,
       userId: 'ToDo',
     };
-    const code = SlingCommitCode.findOne({ id: revertToCommit.slingCommitCodeId });
+    console.log(commit);
+    const code = SlingCommitCode.find({slingCommitCode: commit.slingCommitCodeId});
+    // { id: commit.slingCommitCodeId }
     sling.text = code.text;
-    console.log('MOVING ON SLING: ', sling);
-    sling.commits.push(commit);
+    console.log('CODE: ', code.collection);
+    // console.log('SCHEMA: ', code.schema.paths);
+    // console.log('TREE: ', code.tree);
+    // console.log('MOVING ON SLING: ', sling);
+    // sling.commits.push(commit);
     // await sling.save((err, dbData) => { sling = dbData; });
     // log('sling successfully reverted');
     // return res.status(200).json({
@@ -131,7 +132,7 @@ export const slingRevert = async (req, res) => {
     //     commitList: sling.commits,
     //     codeText: code.text,
     //   },
-    res.json(sling);
+    res.send(sling);
     // });
   } catch (e) {
     log('error reverting sling', e);
