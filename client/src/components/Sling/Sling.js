@@ -17,19 +17,39 @@ class Sling extends Component {
   state = {
     text: '',
     stdout: '',
-    commits: ['A', 'B', 'C']
+    commits: ['A', 'B', 'C'],
+    slingId: '',
+    commitName: ''
   }
 
   handleCommitClick = () => {
-    console.log('WASSUP');
+    axios.get(`${process.env.REACT_APP_REST_SERVER_URL}/api/revert-sling/:slingId`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      },
+      params: {
+        slingId: slindId,
+        commitId: 'FILL_THIS_IN'
+      }
+    })
+      .then( data => {
+        console.log('YEEEE')
+      })
+      .catch( err => {
+        console.log('COMMIT CLICK ERR: ', err);
+      })
+  }
+
+  handleCommitNameChange = (event) => {
+    this.setState({commitName: event.target.value}, ()=> console.log(this.state.commitName))
   }
 
   saveCode = () => {
 
     axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/:slingId`, {
       commit: {
-        slingId: 'pasta-b7b1',
-        commitName: 'test',
+        slingId: this.state.slingId,
+        commitName: this.state.commitName,
         codeText: this.state.text
       }
     }, {headers: {
@@ -40,7 +60,7 @@ class Sling extends Component {
         this.setState({commits: data.data.commit.commitList})
       })
       .catch( err => {
-        console.log('ERR', err);
+        console.log('SAVE CODE CLIENT ERR: ', err);
       })
 
     console.log('STATE: ', this.state.text);
@@ -57,13 +77,15 @@ class Sling extends Component {
       }
     })
       .then( data => {
+        console.log(data.data)
         this.setState({
           text: data.data.sling.text,
-          commits: data.data.sling.commits
+          commits: data.data.sling.commits,
+          slingId: data.data.sling.slingId
         })
       })
       .catch( err => {
-        console.log('ERR', err);
+        console.log('WILL MOUNT ERR: ', err);
       })
   }
 
@@ -146,6 +168,8 @@ class Sling extends Component {
             return <div key={index} onClick={this.handleCommitClick}> {element.name} </div>;
 
           }) }
+
+          <input value={this.state.commitName} onChange={this.handleCommitNameChange} placeholder="Commit Message" />
 
           <Button
             className="run-btn"
