@@ -20,6 +20,7 @@ export const verifyUserWithJWT = (req, res, next) => {
     log('token verified');
     next();
   } catch (e) {
+    console.log('AUTTHHH ', req.headers)
     log('token not verified');
     next(e);
   }

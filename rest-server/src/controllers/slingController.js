@@ -46,10 +46,7 @@ export const slingCreateNew = async (req, res) => {
     return res.status(200).json({
       success: true,
       slingId: sling.slingId,
-      sling: {
-        commitList: sling.commits,
-        codeText: code.text,
-      },
+      sling: sling
     });
   } catch (e) {
     log('error fetching newSling', e);

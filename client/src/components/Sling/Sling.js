@@ -6,6 +6,7 @@ import { throttle } from 'lodash';
 import Button from '../globals/Button';
 import StdOut from './StdOut';
 import EditorHeader from './EditorHeader';
+import axios from 'axios';
 
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/lib/codemirror.css';
@@ -25,11 +26,47 @@ class Sling extends Component {
 
   saveCode = () => {
     console.log('SAVE BUTTON HIT');
-  }
 
+    let headers = {
+      Authorization: `Bearer ${localStorage.token}`
+    }
+
+    axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/:slingId`, {
+      commit: {
+        slingId: '123',
+        commitName: 'test',
+        commitText: this.state.text
+      }
+    }, headers)
+      .then( data => {
+        console.log('YISSSS ');
+      })
+      .catch( err => {
+        console.log('ERR', err);
+      })
+
+    console.log('STATE: ', this.state.text);
+  }
 
   runCode = () => {
     this.socket.emit('client.run');
+  }
+
+  componentWillMount() {
+    axios.get(`${process.env.REACT_APP_REST_SERVER_URL}/api/new-sling`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      }
+    })
+      .then( data => {
+        this.setState({
+          text: data.data.sling.text,
+          commits: data.data.sling.commits
+        })
+      })
+      .catch( err => {
+        console.log('ERR', err);
+      })
   }
 
   componentDidMount() {
@@ -108,7 +145,7 @@ class Sling extends Component {
           Commit History:
 
           { this.state.commits.map( (element, index) => {
-            return <div key={index} onClick={this.handleCommitClick}> {element} </div>;
+            return <div key={index} onClick={this.handleCommitClick}> {element.name} </div>;
 
           }) }
 
