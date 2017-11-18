@@ -6,6 +6,7 @@ import { throttle } from 'lodash';
 import Button from '../globals/Button';
 import StdOut from './StdOut';
 import EditorHeader from './EditorHeader';
+import axios from 'axios';
 
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/lib/codemirror.css';
@@ -15,11 +16,54 @@ import './Sling.css';
 class Sling extends Component {
   state = {
     text: '',
-    stdout: ''
+    stdout: '',
+    commits: ['A', 'B', 'C']
+  }
+
+  handleCommitClick = () => {
+    console.log('WASSUP');
+  }
+
+  saveCode = () => {
+
+    axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/:slingId`, {
+      commit: {
+        slingId: 'tuna-7096',
+        commitName: 'test',
+        codeText: 'this.state.text'
+      }
+    }, {headers: {
+        "authorization": `Bearer ${localStorage.token}`
+    }})
+      .then( data => {
+        console.log('YISSSS ');
+      })
+      .catch( err => {
+        console.log('ERR', err);
+      })
+
+    console.log('STATE: ', this.state.text);
   }
 
   runCode = () => {
     this.socket.emit('client.run');
+  }
+
+  componentWillMount() {
+    axios.get(`${process.env.REACT_APP_REST_SERVER_URL}/api/new-sling`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.token}`,
+      }
+    })
+      .then( data => {
+        this.setState({
+          text: data.data.sling.text,
+          commits: data.data.sling.commits
+        })
+      })
+      .catch( err => {
+        console.log('ERR', err);
+      })
   }
 
   componentDidMount() {
@@ -92,6 +136,22 @@ class Sling extends Component {
           />
           <StdOut 
             text={this.state.stdout}
+          />
+        </div>
+        <div>
+          Commit History:
+
+          { this.state.commits.map( (element, index) => {
+            return <div key={index} onClick={this.handleCommitClick}> {element.name} </div>;
+
+          }) }
+
+          <Button
+            className="run-btn"
+            text="Save Code"
+            backgroundColor="red"
+            color="white"
+            onClick={this.saveCode}
           />
         </div>
       </div>
