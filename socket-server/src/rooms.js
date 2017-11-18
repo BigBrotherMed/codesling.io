@@ -1,6 +1,6 @@
 const startingText =
 `function hello() {
-  console.log('hello socket!');
+  console.log('hello from socket server!');
 }
 
 hello();

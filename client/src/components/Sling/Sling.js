@@ -59,7 +59,9 @@ class Sling extends Component {
     }})
       .then( data => {
         console.log('YISSSS ', data);
+        this.setState({commitName: ''});
         this.setState({commits: data.data.commit.commitList})
+
       })
       .catch( err => {
         console.log('SAVE CODE CLIENT ERR: ', err);
@@ -160,31 +162,64 @@ class Sling extends Component {
           <StdOut 
             text={this.state.stdout}
           />
+          <br/>
+          <hr/>
+          <br/>
+          <table>
+            <tr>
+              <td>
+                <Button
+                  className="run-btn"
+                  text="Save Code"
+                  backgroundColor="red"
+                  color="white"
+                  onClick={this.saveCode}
+                />
+                </td>
+                <td></td>
+                <td></td>
+                <td>
+                  <input 
+                    value={this.state.commitName} 
+                    onChange={this.handleCommitNameChange} 
+                    placeholder="Commit Name" 
+                  />
+                </td>
+              </tr>
+              <tr>
+              <td></td>
+              
+
+              <td colspan="3">
+                <h5>Commit History</h5>
+              </td>
+              <td></td>
+            </tr>
+              {console.log(this.state.commits)}
+              { this.state.commits.map( (element, index, commits) => {
+
+                return <tr
+                  key={index}
+                  id={element.slingCommitCodeId}
+                  // there is also a _id
+                  onClick={this.revertCode}>
+                  <td></td>
+                  <td><p>{index}</p></td>
+                  <td></td>
+                  <td><p>{element.name}</p></td>
+                </tr>;
+              }) }                
+          </table>
+     
+
+              <div>
+              
+
+    
+            </div>
         </div>
-        <div>
-          Commit History:
-          {console.log(this.state.commits)}
-          { this.state.commits.map( (element, index) => {
-            return <div
-              key={index}
-              id={element.slingCommitCodeId}
-              // there is also a _id
-              onClick={this.revertCode}>
-              {element.name}
-              </div>;
 
-          }) }
 
-          <input value={this.state.commitName} onChange={this.handleCommitNameChange} placeholder="Commit Message" />
-
-          <Button
-            className="run-btn"
-            text="Save Code"
-            backgroundColor="red"
-            color="white"
-            onClick={this.saveCode}
-          />
-        </div>
       </div>
     );
   }
