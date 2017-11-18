@@ -16,7 +16,7 @@ const existsInDatabase = async (slingId) => {
 
 const startingText =
 `function hello() {
-  console.log('hello!');
+  console.log('hello frm rest server!');
 }
 
 hello();

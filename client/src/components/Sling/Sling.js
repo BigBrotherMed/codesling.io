@@ -28,7 +28,7 @@ class Sling extends Component {
         Authorization: `Bearer ${localStorage.token}`,
       },
       params: {
-        slingId: slindId,
+        slingId: 'FILL THIS IN',
         commitId: 'FILL_THIS_IN'
       }
     })
@@ -83,6 +83,7 @@ class Sling extends Component {
           commits: data.data.sling.commits,
           slingId: data.data.sling.slingId
         })
+      // document.getElementById('editor').fireEvent("onChange");
       })
       .catch( err => {
         console.log('WILL MOUNT ERR: ', err);
@@ -137,7 +138,7 @@ class Sling extends Component {
     return (
       <div className="sling-container">
         <EditorHeader />
-        <div className="code-editor-container">
+        <div id="editor" className="code-editor-container">
           <CodeMirror
             editorDidMount={this.initializeEditor}
             value={this.state.text}
@@ -165,7 +166,7 @@ class Sling extends Component {
           Commit History:
 
           { this.state.commits.map( (element, index) => {
-            return <div key={index} onClick={this.handleCommitClick}> {element.name} </div>;
+            return <div key={index} onClick={this.handleCommitClick}> {element.name}  </div>;
 
           }) }
 
