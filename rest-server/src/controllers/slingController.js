@@ -93,9 +93,25 @@ export const slingCommit = async (req, res) => {
 
 export const slingRevert = async (req, res) => {
   try {
-    const { slingId, commitId } = req.body.revert;
+    console.log('HITTING REVERT REQ: ', req.query);
+    const { slingId, commitId } = req.query;
+    console.log('SERVER SLING ID: ', slingId);
+    console.log('SERVER COMMIT ID: ', commitId)
     let sling = await Sling.findOne({ slingId });
-    const revertToCommit = sling.commits.findOne({ id: commitId });
+    console.log('THIS IS OBV A STRING: ', JSON.stringify(sling.commits[0]._id));
+    let revertToCommit;
+    // = sling.commits.findOne({ id: commitId });
+    for(let i = 0; i < sling.commits.length; i++) {
+      console.log( typeof commitId);
+      let id1 = JSON.stringify(sling.commits[i]._id).slice(0,22)
+      let id2 = JSON.stringify(commitId).slice(0,22);
+      console.log(id1, id2);
+      if(id1 === id2) {
+        revertToCommit = sling.commits[i];
+        console.log('YEEE BOII')
+        break;
+      }
+    }
     const commit = {
       sourceCommitId: revertToCommit.id,
       slingCommitCodeId: revertToCommit.slingCommitCodeId,
@@ -105,16 +121,18 @@ export const slingRevert = async (req, res) => {
     };
     const code = SlingCommitCode.findOne({ id: revertToCommit.slingCommitCodeId });
     sling.text = code.text;
-    sling.push(commit);
-    await sling.save((err, dbData) => { sling = dbData; });
-    log('sling successfully reverted');
-    return res.status(200).json({
-      success: true,
-      revert: {
-        commitList: sling.commits,
-        codeText: code.text,
-      },
-    });
+    console.log('MOVING ON SLING: ', sling);
+    sling.commits.push(commit);
+    // await sling.save((err, dbData) => { sling = dbData; });
+    // log('sling successfully reverted');
+    // return res.status(200).json({
+    //   success: true,
+    //   revert: {
+    //     commitList: sling.commits,
+    //     codeText: code.text,
+    //   },
+    res.json(sling);
+    // });
   } catch (e) {
     log('error reverting sling', e);
     return res.status(400).json({

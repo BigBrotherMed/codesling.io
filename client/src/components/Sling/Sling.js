@@ -22,31 +22,33 @@ class Sling extends Component {
     commitName: ''
   }
 
-  handleCommitClick = () => {
-    axios.get(`${process.env.REACT_APP_REST_SERVER_URL}/api/revert-sling/:slingId`, {
+  revertCode = (event) => {
+
+    axios.get(`${process.env.REACT_APP_REST_SERVER_URL}/api/revert-sling/${this.state.slingId}`, {
       headers: {
         Authorization: `Bearer ${localStorage.token}`,
       },
       params: {
-        slingId: 'FILL THIS IN',
-        commitId: 'FILL_THIS_IN'
+        slingId: this.state.slingId,
+        commitId: event.target.id
       }
     })
       .then( data => {
         console.log('YEEEE')
       })
       .catch( err => {
+        console.log('THIS IS UNDEFINED: ', this.state.slingId);
         console.log('COMMIT CLICK ERR: ', err);
       })
   }
 
   handleCommitNameChange = (event) => {
-    this.setState({commitName: event.target.value}, ()=> console.log(this.state.commitName))
+    this.setState({commitName: event.target.value})
   }
 
   saveCode = () => {
 
-    axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/:slingId`, {
+    axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/${this.state.slingId}`, {
       commit: {
         slingId: this.state.slingId,
         commitName: this.state.commitName,
@@ -62,8 +64,6 @@ class Sling extends Component {
       .catch( err => {
         console.log('SAVE CODE CLIENT ERR: ', err);
       })
-
-    console.log('STATE: ', this.state.text);
   }
 
   runCode = () => {
@@ -77,13 +77,12 @@ class Sling extends Component {
       }
     })
       .then( data => {
-        console.log(data.data)
+        console.log('DATA: ', data.data)
         this.setState({
           text: data.data.sling.text,
           commits: data.data.sling.commits,
-          slingId: data.data.sling.slingId
-        })
-      // document.getElementById('editor').fireEvent("onChange");
+          slingId: this.props.slingId
+        }, () => console.log('PLS WORK: ', this.state.slingId))
       })
       .catch( err => {
         console.log('WILL MOUNT ERR: ', err);
@@ -164,9 +163,15 @@ class Sling extends Component {
         </div>
         <div>
           Commit History:
-
+          {console.log(this.state.commits)}
           { this.state.commits.map( (element, index) => {
-            return <div key={index} onClick={this.handleCommitClick}> {element.name}  </div>;
+            return <div
+              key={index}
+              id={element.slingCommitCodeId}
+              // there is also a _id
+              onClick={this.revertCode}>
+              {element.name}
+              </div>;
 
           }) }
 
