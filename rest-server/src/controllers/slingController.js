@@ -61,7 +61,9 @@ export const slingCommit = async (req, res) => {
   try {
     const { slingId, commitName, codeText } = req.body.commit;
     let sling = await Sling.findOne({ slingId });
-    let code = new SlingCommitCode({ codeText });
+    console.log(codeText);
+    console.log('SLINGGG: ', sling);
+    let code = new SlingCommitCode({ text: codeText });
     await code.save((err, dbData) => { code = dbData; });
     const lastCommit = sling.commits[sling.commits.length - 1];
     const commit = new SlingCommit({
@@ -81,7 +83,7 @@ export const slingCommit = async (req, res) => {
       },
     });
   } catch (e) {
-    log('error committing sling', e);
+    log('error committing sling LALALA', e);
     return res.status(400).json({
       success: false,
       e,

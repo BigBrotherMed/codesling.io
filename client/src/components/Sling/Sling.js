@@ -25,19 +25,16 @@ class Sling extends Component {
   }
 
   saveCode = () => {
-    console.log('SAVE BUTTON HIT');
-
-    let headers = {
-      Authorization: `Bearer ${localStorage.token}`
-    }
 
     axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/:slingId`, {
       commit: {
-        slingId: '123',
+        slingId: 'tuna-7096',
         commitName: 'test',
-        commitText: this.state.text
+        codeText: 'this.state.text'
       }
-    }, headers)
+    }, {headers: {
+        "authorization": `Bearer ${localStorage.token}`
+    }})
       .then( data => {
         console.log('YISSSS ');
       })
