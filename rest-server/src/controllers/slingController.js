@@ -16,14 +16,11 @@ const existsInDatabase = async (slingId) => {
 
 const startingText =
 `function hello() {
-  console.log('hello frm rest server!');
+  console.log('hello from rest server!');
 }
 
 hello();
 `;
- 
-
-  
 export const slingCreateNew = async (req, res) => {
   try {
     let slingId = generateSlingId();
