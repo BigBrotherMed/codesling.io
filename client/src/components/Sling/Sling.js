@@ -28,15 +28,16 @@ class Sling extends Component {
 
     axios.post(`${process.env.REACT_APP_REST_SERVER_URL}/api/commit-sling/:slingId`, {
       commit: {
-        slingId: 'tuna-7096',
+        slingId: 'pasta-b7b1',
         commitName: 'test',
-        codeText: 'this.state.text'
+        codeText: this.state.text
       }
     }, {headers: {
         "authorization": `Bearer ${localStorage.token}`
     }})
       .then( data => {
-        console.log('YISSSS ');
+        console.log('YISSSS ', data);
+        this.setState({commits: data.data.commit.commitList})
       })
       .catch( err => {
         console.log('ERR', err);
